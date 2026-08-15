@@ -84,7 +84,8 @@ conflict badges keep meaningful cross-check results visible.
 5. Press **Pop out** to replace the bar popup with a normal floating window.
    Drag its dotted title-bar handle to place it anywhere on the screen. The
    detached view has its own scroll position, auto-scroll button, and speed
-   control.
+   control. A pre-map Hyprland rule makes it floating immediately, without a
+   tiled-window flash.
 
 When Omarchy Spotify is actively playing a track, opening Omasing automatically
 shows that recording using Spotify's title, artist, album, duration, artwork,

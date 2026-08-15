@@ -46,6 +46,7 @@ Panel {
   property int resultCursor: 0
   property real autoScrollLinesPerSecond: configuredLineRate()
   property int detachedPlacementAttempt: 0
+  property bool detachedOpenPending: false
   property real initialPlaybackPositionSeconds: 0
   property real initialPlaybackDurationSeconds: 0
   readonly property real playbackScrollContextFraction: 0.4
@@ -126,6 +127,29 @@ Panel {
     autoScroll.pause()
     detachedAutoScroll.pause()
     detachedLyricsFlick.contentY = Number(detachedLyricsFlick.originY) || 0
+    detachedOpenPending = true
+    if (!detachedRuleProcess.running) {
+      detachedRuleProcess.command = ["hyprctl", "eval",
+        'if stappmus_lyrics_popout_rule == nil then '
+        + 'stappmus_lyrics_popout_rule = hl.window_rule({ '
+        + 'name = "stappmus-lyrics-popout-pre-map", '
+        + 'match = { class = "org[.]quickshell", '
+        + 'title = "Popout — Omasing" }, '
+        + 'float = true, size = { 560, 760 }, '
+        + 'move = { "(monitor_w-window_w)/2", '
+        + '"(monitor_h-window_h)/2" } }) '
+        + 'else stappmus_lyrics_popout_rule:set_enabled(true) end']
+      detachedRuleProcess.running = true
+    }
+    return true
+  }
+
+  function showDetachedWindow() {
+    if (!detachedOpenPending || !lyricsReady) {
+      detachedOpenPending = false
+      return
+    }
+    detachedOpenPending = false
     detachedWindow.visible = true
     close()
     Qt.callLater(function() {
@@ -135,19 +159,18 @@ Panel {
         root.playbackScrollContextFraction)
       detachedFocus.forceActiveFocus()
     })
-    return true
   }
 
   function closeDetached() {
+    detachedOpenPending = false
     detachedAutoScroll.pause()
     detachedWindow.visible = false
   }
 
   function placeDetachedWindow() {
     if (!detachedWindow.visible) return
-    // FloatingWindow is a regular toplevel; Hyprland tiles regular toplevels
-    // by default. Wait until this specific titled client is mapped before
-    // applying float/size/center; dispatching before the map is a no-op.
+    // The pre-map rule handles initial float, size, and position. Keep this
+    // address probe as a fallback and for the recenter IPC action.
     if (detachedPlacementProbe.running || detachedPlacementProcess.running) return
     detachedPlacementProbe.command = ["hyprctl", "clients", "-j"]
     detachedPlacementProbe.running = true
@@ -155,7 +178,7 @@ Panel {
 
   function runDetachedPlacement() {
     detachedPlacementProcess.command = ["hyprctl", "--batch",
-      'dispatch hl.dsp.window.float({ action = "set", window = "title:.*Omasing" }); '
+      'dispatch hl.dsp.window.float({ action = "enable", window = "title:.*Omasing" }); '
       + 'dispatch hl.dsp.window.resize({ x = 560, y = 760, window = "title:.*Omasing" }); '
       + 'dispatch hl.dsp.window.center({ window = "title:.*Omasing" })']
     detachedPlacementProcess.running = true
@@ -305,6 +328,25 @@ Panel {
   }
 
   LyricsService { id: lyricsService }
+
+  Process {
+    id: detachedRuleProcess
+    running: false
+    command: []
+
+    stdout: StdioCollector {
+      waitForEnd: true
+    }
+    stderr: StdioCollector {
+      id: detachedRuleErrors
+      waitForEnd: true
+    }
+    onExited: function() {
+      var errorText = String(detachedRuleErrors.text || "").trim()
+      if (errorText !== "") console.warn("Omasing pop-out rule:", errorText)
+      root.showDetachedWindow()
+    }
+  }
 
   Process {
     id: detachedPlacementProbe
@@ -950,9 +992,7 @@ Panel {
   FloatingWindow {
     id: detachedWindow
     visible: false
-    title: root.selectedSong
-      ? String(root.selectedSong.title || "Lyrics") + " — Omasing"
-      : "Omasing"
+    title: "Popout — Omasing"
     color: root.background
     implicitWidth: Style.space(560)
     implicitHeight: Style.space(760)
