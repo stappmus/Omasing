@@ -70,4 +70,3 @@ done
 
 omarchy plugin enable stappmus.lyrics --section "$section"
 echo "Installed. Click the lyrics icon in the Omarchy bar."
-
