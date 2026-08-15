@@ -20,6 +20,9 @@ Panel {
   readonly property color accent: Color.accent
   readonly property color dim: Qt.darker(foreground, 1.45)
   readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
+  readonly property var spotifyService: bar && bar.shell
+    && typeof bar.shell.serviceFor === "function"
+      ? bar.shell.serviceFor("quickshell.spotify") : null
   readonly property bool lyricsReady: lyricsService.lyricsState === "ready"
     && lyricsService.lyrics && String(lyricsService.lyrics.plainLyrics || "") !== ""
   readonly property var verification: lyricsService.lyrics
@@ -87,12 +90,30 @@ Panel {
       bar.shell.updateEntryInline(root.moduleName, entry)
   }
 
-  function open() {
+  function currentSpotifySong() {
+    var service = spotifyService
+    if (!service || service.playing !== true || !service.currentLyricsSong)
+      return null
+
+    var source = service.currentLyricsSong
+    var song = ({})
+    for (var key in source) song[key] = source[key]
+    song.positionSeconds = Math.max(0, Number(service.positionSeconds) || 0)
+    return song
+  }
+
+  function showPanel() {
     controller.show()
     Qt.callLater(function() {
       if (root.page === "search") searchField.forceActiveFocus()
       else keyCatcher.forceActiveFocus()
     })
+  }
+
+  function open() {
+    var spotifySong = currentSpotifySong()
+    if (spotifySong) openSong(spotifySong)
+    showPanel()
   }
 
   function close() {
@@ -184,7 +205,7 @@ Panel {
     if (!song || !String(song.title || "").trim()
         || !String(song.artist || "").trim()) return "invalid-song"
     openSong(song)
-    open()
+    showPanel()
     return "ok"
   }
 

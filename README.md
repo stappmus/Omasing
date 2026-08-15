@@ -86,12 +86,14 @@ conflict badges keep meaningful cross-check results visible.
    detached view has its own scroll position, auto-scroll button, and speed
    control.
 
-Omarchy Spotify can skip the search step: press its lyrics button in either
-player and Omasing opens the current recording directly using Spotify's title,
-artist, album, duration, artwork, and playback position. The initial view uses
-the song's elapsed fraction and the rendered amount of lyric text to keep the
-likely current line about 40% down the viewport. The equivalent safety offset
-automatically grows for sparse lyrics and shrinks for lyric-dense songs.
+When Omarchy Spotify is actively playing a track, opening Omasing automatically
+shows that recording using Spotify's title, artist, album, duration, artwork,
+and current playback position. Spotify's lyrics buttons provide the same direct
+handoff. The initial view uses the song's elapsed fraction and the rendered
+amount of lyric text to keep the likely current line about 40% down the
+viewport. The equivalent safety offset automatically grows for sparse lyrics
+and shrinks for lyric-dense songs. Use Back or `/` whenever you want to search
+for something else.
 
 Keyboard controls:
 
