@@ -1,4 +1,4 @@
-# Omasing Lyrics
+# Omasing
 
 I was tired of being bombarded with ads every time I looked up lyrics, so I
 made this plugin.

@@ -931,7 +931,7 @@ Panel {
     visible: false
     title: root.selectedSong
       ? String(root.selectedSong.title || "Lyrics") + " — Omasing"
-      : "Omasing Lyrics"
+      : "Omasing"
     color: root.background
     implicitWidth: Style.space(560)
     implicitHeight: Style.space(760)

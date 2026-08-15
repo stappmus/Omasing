@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "stappmus.lyrics",
-  "name": "Omasing Lyrics",
+  "name": "Omasing",
   "version": "0.1.2",
   "author": "stappmus",
   "license": "MIT",
@@ -14,7 +14,7 @@
     "barWidget": "Panel.qml"
   },
   "barWidget": {
-    "displayName": "Omasing Lyrics",
+    "displayName": "Omasing",
     "description": "Search songs and read cross-checked lyrics with adjustable auto-scroll.",
     "category": "Media",
     "aliases": [
