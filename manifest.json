@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "stappmus.lyrics",
   "name": "Omasing",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "stappmus",
   "license": "MIT",
   "description": "I was tired of being bombarded with ads every time I looked up lyrics, so I made this fast, cross-checked lyric popup for Omarchy.",

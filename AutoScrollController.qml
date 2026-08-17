@@ -96,11 +96,16 @@ Item {
       deferredPlaybackSeek.restart()
       return flickable.contentY
     }
-    flickable.cancelFlick()
+    stopManualMotion()
     flickable.contentY = playbackTargetContentY(pendingPositionSeconds,
       pendingDurationSeconds, pendingContextViewportFraction)
     playbackSeekPending = false
     return flickable.contentY
+  }
+
+  function stopManualMotion() {
+    if (flickable && flickable.cancelFlick) flickable.cancelFlick()
+    if (boundsHelper && boundsHelper.stopAnimation) boundsHelper.stopAnimation()
   }
 
   function start() {
@@ -110,6 +115,7 @@ Item {
       running = false
       return false
     }
+    stopManualMotion()
     lastTickMs = Date.now()
     running = true
     return true
@@ -133,7 +139,7 @@ Item {
     lastTickMs = now
     if (elapsed <= 0) return flickable.contentY
 
-    flickable.cancelFlick()
+    if (flickable.flicking || flickable.dragging) flickable.cancelFlick()
     var maximum = maximumContentY()
     var next = boundsHelper.boundedContentY(flickable.contentY
       + Math.max(0, Number(linesPerSecond) || 0)
@@ -146,9 +152,9 @@ Item {
     return next
   }
 
-  Timer {
-    interval: 16
-    repeat: true
+  // Display-clock ticks keep subpixel motion continuous on high-refresh
+  // screens. Distance is still computed from elapsed time, not frame count.
+  FrameAnimation {
     running: root.running && root.clockEnabled
     onTriggered: root.advanceTo(Date.now())
   }

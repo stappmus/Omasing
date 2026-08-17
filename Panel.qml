@@ -267,7 +267,7 @@ Panel {
   function nudgeLyrics(direction) {
     if (!lyricsReady) return
     autoScroll.pause()
-    lyricsFastScroll.scrollByDeltas(0, -120 * Number(direction || 0))
+    lyricsFastScroll.scrollByDeltasAnimated(0, -120 * Number(direction || 0))
   }
 
   function toggleDetachedAutoScroll() {
@@ -890,6 +890,7 @@ Panel {
             contentHeight: lyricContent.height
             boundsBehavior: Flickable.StopAtBounds
             flickableDirection: Flickable.VerticalFlick
+            pixelAligned: false
             interactive: contentHeight > height
             onMovementStarted: if (autoScroll.running) autoScroll.pause()
 
@@ -912,7 +913,7 @@ Panel {
                 lineHeightMode: Text.ProportionalHeight
                 wrapMode: Text.Wrap
                 textFormat: Text.PlainText
-                renderType: Text.NativeRendering
+                renderType: Text.QtRendering
               }
             }
 
@@ -1022,12 +1023,12 @@ Panel {
       }
       Keys.onUpPressed: function(event) {
         detachedAutoScroll.pause()
-        detachedFastScroll.scrollByDeltas(0, 120)
+        detachedFastScroll.scrollByDeltasAnimated(0, 120)
         event.accepted = true
       }
       Keys.onDownPressed: function(event) {
         detachedAutoScroll.pause()
-        detachedFastScroll.scrollByDeltas(0, -120)
+        detachedFastScroll.scrollByDeltasAnimated(0, -120)
         event.accepted = true
       }
 
@@ -1208,6 +1209,7 @@ Panel {
         contentHeight: detachedLyricContent.height
         boundsBehavior: Flickable.StopAtBounds
         flickableDirection: Flickable.VerticalFlick
+        pixelAligned: false
         interactive: contentHeight > height
         onMovementStarted: if (detachedAutoScroll.running) detachedAutoScroll.pause()
 
@@ -1230,7 +1232,7 @@ Panel {
             lineHeightMode: Text.ProportionalHeight
             wrapMode: Text.Wrap
             textFormat: Text.PlainText
-            renderType: Text.NativeRendering
+            renderType: Text.QtRendering
           }
         }
 

@@ -102,6 +102,8 @@ TestCase {
     delayedAutoScroll.pause()
     delayedContent.height = 0
     delayedFlick.contentY = delayedFlick.originY
+    fastScroll.stopAnimation()
+    fastScroll.notchAnimationMs = 180
     list.positionViewAtBeginning()
     scrollSpy.clear()
     endSpy.clear()
@@ -191,5 +193,32 @@ TestCase {
     wait(20)
     verify(!delayedAutoScroll.playbackSeekPending)
     verify(Math.abs(delayedFlick.contentY - 210) < 0.01)
+  }
+
+  function test_pixelDeltasStayImmediateWhenAnimated() {
+    compare(fastScroll.scrollByDeltasAnimated(-14, 0), 56)
+    compare(list.contentY, 56)
+    verify(!fastScroll.animating)
+  }
+
+  function test_notchScrollAnimatesTowardTheTarget() {
+    fastScroll.notchAnimationMs = 80
+    var expected = fastScroll.mouseWheelStep * 4
+    compare(fastScroll.scrollByDeltasAnimated(0, -120), expected)
+    verify(list.contentY <= expected)
+    tryVerify(function() {
+      return Math.abs(list.contentY - expected) < 0.5
+    })
+    verify(!fastScroll.animating)
+  }
+
+  function test_stackedNotchesKeepASingleTarget() {
+    fastScroll.notchAnimationMs = 120
+    var step = fastScroll.mouseWheelStep * 4
+    compare(fastScroll.scrollByDeltasAnimated(0, -120), step)
+    compare(fastScroll.scrollByDeltasAnimated(0, -120), step * 2)
+    tryVerify(function() {
+      return Math.abs(list.contentY - step * 2) < 0.5
+    })
   }
 }
